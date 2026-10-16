@@ -27,6 +27,7 @@ import urllib.request
 
 BASE_URL = "https://pncp.gov.br/api/consulta"
 PAGE_SIZE = 50  # máximo aceito pela API de consulta
+PAUSA = 1.0  # segundos entre páginas; o PNCP devolve 429 se for rápido demais
 
 MODALIDADES = {
     1: "Leilão eletrônico",
@@ -75,7 +76,7 @@ def classificar(texto, grupos, exclusoes):
     return achados or None
 
 
-def buscar_pagina(base_url, params, tentativas=4):
+def buscar_pagina(base_url, params, tentativas=6):
     url = f"{base_url}/v1/contratacoes/proposta?{urllib.parse.urlencode(params)}"
     req = urllib.request.Request(url, headers={"Accept": "application/json",
                                                "User-Agent": "cacador-licitacoes/1.0"})
@@ -93,24 +94,41 @@ def buscar_pagina(base_url, params, tentativas=4):
                 detalhe = e.read().decode("utf-8", "replace")[:300]
                 raise RuntimeError(f"PNCP recusou a consulta ({e.code}): {detalhe}") from e
             erro = e
+            espera = e.headers.get("Retry-After") if e.code == 429 else None
+            if espera and espera.isdigit():
+                time.sleep(int(espera))
+                continue
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
             erro = e
-        time.sleep(2 ** (i + 1))
+        time.sleep(min(60, 5 * 2 ** i))
     raise RuntimeError(f"PNCP indisponível após {tentativas} tentativas: {erro}")
 
 
-def coletar(base_url, data_final, modalidades, ufs, max_paginas=None, log=print):
-    """Itera todas as contratações com proposta aberta até data_final."""
+def coletar(base_url, data_final, modalidades, ufs, max_paginas=None, log=print,
+            pausa=PAUSA, falhas=None):
+    """Itera todas as contratações com proposta aberta até data_final.
+
+    Uma consulta que falha de vez vai para `falhas` e a busca segue com as outras.
+    """
     for modalidade in modalidades:
         for uf in ufs or [None]:
             pagina = 1
             while True:
+                if pagina > 1:
+                    time.sleep(pausa)
                 params = {"dataFinal": data_final,
                           "codigoModalidadeContratacao": modalidade,
                           "pagina": pagina, "tamanhoPagina": PAGE_SIZE}
                 if uf:
                     params["uf"] = uf
-                resp = buscar_pagina(base_url, params)
+                try:
+                    resp = buscar_pagina(base_url, params)
+                except RuntimeError as e:
+                    nome = f"{MODALIDADES.get(modalidade, modalidade)} / {uf or 'Brasil'}"
+                    log(f"  AVISO: {nome} parou na página {pagina}: {e}")
+                    if falhas is not None:
+                        falhas.append(f"{nome} (a partir da página {pagina})")
+                    break
                 dados = resp.get("data") or []
                 total = resp.get("totalPaginas") or 0
                 if pagina == 1:
@@ -189,7 +207,7 @@ def data_br(iso):
         return iso
 
 
-def escrever_relatorios(oportunidades, pasta, cfg, novas_ids=None):
+def escrever_relatorios(oportunidades, pasta, cfg, novas_ids=None, falhas=None):
     os.makedirs(pasta, exist_ok=True)
     with open(os.path.join(pasta, "oportunidades.json"), "w", encoding="utf-8") as f:
         json.dump(oportunidades, f, ensure_ascii=False, indent=2)
@@ -204,6 +222,9 @@ def escrever_relatorios(oportunidades, pasta, cfg, novas_ids=None):
     linhas = [f"# Oportunidades para {emp['nome_fantasia']}", "",
               f"Gerado em {hoje}. {len(oportunidades)} contratações com proposta aberta "
               f"casaram com as atividades da empresa.", ""]
+    if falhas:
+        linhas += ["> **Busca incompleta.** Estas consultas falharam no PNCP: "
+                   + "; ".join(falhas) + ".", ""]
     for o in oportunidades:
         marca = " 🆕" if novas_ids and o["id_pncp"] in novas_ids else ""
         me = " · faixa exclusiva ME/EPP possível" if o["faixa_me_epp"] else ""
@@ -233,6 +254,8 @@ def main(argv=None):
     ap.add_argument("--saida", default=os.path.join(HERE, "relatorios"))
     ap.add_argument("--novas", action="store_true",
                     help="mostra só oportunidades ainda não vistas (usa vistos.json)")
+    ap.add_argument("--pausa", type=float, default=PAUSA,
+                    help="segundos entre páginas (padrão %(default)s)")
     ap.add_argument("--base-url", default=os.environ.get("PNCP_BASE_URL", BASE_URL))
     args = ap.parse_args(argv)
 
@@ -247,8 +270,9 @@ def main(argv=None):
     log = lambda m: print(m, file=sys.stderr)
     log(f"Buscando no PNCP propostas abertas até {data_final} "
         f"({', '.join(ufs) if ufs else 'Brasil inteiro'})...")
+    falhas = []
     brutas = coletar(args.base_url, data_final, modalidades, [u.upper() for u in ufs],
-                     args.max_paginas, log)
+                     args.max_paginas, log, args.pausa, falhas)
     oportunidades = filtrar(brutas, cfg)
 
     novas_ids = None
@@ -264,7 +288,7 @@ def main(argv=None):
         with open(caminho_vistos, "w", encoding="utf-8") as f:
             json.dump(sorted(vistos | novas_ids), f)
 
-    escrever_relatorios(oportunidades, args.saida, cfg, novas_ids)
+    escrever_relatorios(oportunidades, args.saida, cfg, novas_ids, falhas)
     log(f"{len(oportunidades)} oportunidades. Relatório em {args.saida}/oportunidades.md")
     return 0
 

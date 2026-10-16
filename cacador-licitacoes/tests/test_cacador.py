@@ -47,10 +47,17 @@ PAGINAS = {
 
 class FakePNCP(http.server.BaseHTTPRequestHandler):
     pedidos = []
+    recusar_proxima = False  # simula o 429 do PNCP uma vez
 
     def do_GET(self):
         q = dict(urllib.parse.parse_qsl(urllib.parse.urlparse(self.path).query))
         FakePNCP.pedidos.append(q)
+        if FakePNCP.recusar_proxima:
+            FakePNCP.recusar_proxima = False
+            self.send_response(429)
+            self.send_header("Retry-After", "0")
+            self.end_headers()
+            return
         pagina = int(q["pagina"])
         corpo = json.dumps({"data": PAGINAS.get(pagina, []), "totalRegistros": 6,
                             "totalPaginas": len(PAGINAS), "numeroPagina": pagina}).encode()
@@ -76,9 +83,10 @@ class CacadorTest(unittest.TestCase):
 
     def test_busca_filtra_e_gera_relatorios(self):
         FakePNCP.pedidos.clear()
+        FakePNCP.recusar_proxima = True
         with tempfile.TemporaryDirectory() as tmp:
             rc = cacador.main(["--base-url", self.base, "--uf", "SE", "--modalidade", "6",
-                               "--saida", tmp, "--novas"])
+                               "--saida", tmp, "--novas", "--pausa", "0"])
             self.assertEqual(rc, 0)
             with open(os.path.join(tmp, "oportunidades.json"), encoding="utf-8") as f:
                 ops = json.load(f)
@@ -93,11 +101,11 @@ class CacadorTest(unittest.TestCase):
                 self.assertIn("PUBLICIDADE", f.read())
             self.assertEqual(FakePNCP.pedidos[0]["uf"], "SE")
             self.assertEqual(FakePNCP.pedidos[0]["codigoModalidadeContratacao"], "6")
-            self.assertEqual(len(FakePNCP.pedidos), 2)
+            self.assertEqual(len(FakePNCP.pedidos), 3)  # 429 + 2 páginas
 
             # Segunda rodada com --novas: nada de novo.
             cacador.main(["--base-url", self.base, "--uf", "SE", "--modalidade", "6",
-                          "--saida", tmp, "--novas"])
+                          "--saida", tmp, "--novas", "--pausa", "0"])
             with open(os.path.join(tmp, "oportunidades.json"), encoding="utf-8") as f:
                 self.assertEqual(json.load(f), [])
 
