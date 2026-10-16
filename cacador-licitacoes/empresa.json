@@ -1,0 +1,44 @@
+{
+  "empresa": {
+    "razao_social": "NEXTGEN ACCELERATOR LTDA",
+    "nome_fantasia": "NEXTGEN ACCELERATOR",
+    "cnpj": "51.186.218/0001-13",
+    "porte": "ME",
+    "natureza_juridica": "206-2 - Sociedade Empresária Limitada",
+    "abertura": "2023-06-26",
+    "municipio": "Aracaju",
+    "uf": "SE",
+    "cnaes": {
+      "73.11-4-00": "Agências de publicidade (principal)",
+      "85.99-6-04": "Treinamento em desenvolvimento profissional e gerencial"
+    }
+  },
+  "busca": {
+    "ufs": ["SE", "AL", "BA", "PE"],
+    "modalidades": [6, 8, 4, 7, 12, 3],
+    "dias_a_frente": 60,
+    "valor_minimo": 0,
+    "valor_maximo": null
+  },
+  "palavras_chave": {
+    "publicidade": [
+      "publicidade", "publicitari", "propaganda", "agencia de comunicacao",
+      "comunicacao institucional", "marketing", "midias sociais", "redes sociais",
+      "midia digital", "trafego pago", "producao audiovisual", "producao de video",
+      "identidade visual", "design grafico", "criacao de campanha", "campanha publicitaria",
+      "assessoria de comunicacao", "gestao de conteudo", "branding"
+    ],
+    "treinamento": [
+      "treinamento", "capacitacao", "qualificacao profissional", "curso",
+      "palestra", "workshop", "oficina", "desenvolvimento gerencial",
+      "desenvolvimento profissional", "lideranca", "empreendedorismo",
+      "educacao corporativa", "mentoria", "coaching", "aceleracao de empresas",
+      "consultoria em gestao"
+    ]
+  },
+  "palavras_excluir": [
+    "medicament", "obra de", "pavimentacao", "combustivel", "genero alimenticio",
+    "veiculo", "pneu", "material de construcao", "vacina", "hospitalar",
+    "curso d agua", "curso dagua", "mecanic", "concurso publico", "leilao de"
+  ]
+}

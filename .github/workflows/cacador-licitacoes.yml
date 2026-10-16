@@ -1,0 +1,40 @@
+name: Caçador de licitações
+
+on:
+  schedule:
+    - cron: '0 10 * * 1-5'  # 07h de Brasília, dias úteis
+  workflow_dispatch:
+    inputs:
+      ufs:
+        description: 'UFs separadas por espaço (vazio = as do empresa.json, "BR" = Brasil)'
+        required: false
+  pull_request:
+    paths: ['cacador-licitacoes/**', '.github/workflows/cacador-licitacoes.yml']
+
+jobs:
+  cacar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes
+        run: python -m unittest discover -s cacador-licitacoes/tests -v
+      - name: Buscar no PNCP
+        env:
+          UFS: ${{ github.event.inputs.ufs }}
+        run: |
+          ARGS=""
+          if [ "$UFS" = "BR" ]; then ARGS="--brasil"
+          else for uf in $UFS; do ARGS="$ARGS --uf $uf"; done; fi
+          python cacador-licitacoes/cacador.py $ARGS
+          cat cacador-licitacoes/relatorios/oportunidades.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Compliance dos documentos
+        run: |
+          python cacador-licitacoes/compliance.py --saida cacador-licitacoes/relatorios/compliance.md
+          cat cacador-licitacoes/relatorios/compliance.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oportunidades
+          path: cacador-licitacoes/relatorios/
