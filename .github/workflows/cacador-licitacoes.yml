@@ -30,6 +30,10 @@ jobs:
           else for uf in $UFS; do ARGS="$ARGS --uf $uf"; done; fi
           python cacador-licitacoes/cacador.py $ARGS
           cat cacador-licitacoes/relatorios/oportunidades.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Compliance dos documentos
+        run: |
+          python cacador-licitacoes/compliance.py --saida cacador-licitacoes/relatorios/compliance.md
+          cat cacador-licitacoes/relatorios/compliance.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: oportunidades

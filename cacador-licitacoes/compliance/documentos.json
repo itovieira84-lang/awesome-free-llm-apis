@@ -1,0 +1,155 @@
+{
+  "_como_usar": "Preencha emitido_em (AAAA-MM-DD) ao emitir. Se a certidão trouxer a data de validade, preencha vence_em; ela tem prioridade sobre validade_dias. Itens com validade_dias e vence_em vazios não vencem (ex.: contrato social).",
+  "documentos": [
+    {
+      "id": "cartao_cnpj",
+      "nome": "Cartão CNPJ",
+      "categoria": "fiscal",
+      "onde": "Receita Federal",
+      "validade_dias": null,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "contrato_social",
+      "nome": "Contrato social consolidado",
+      "categoria": "juridica",
+      "onde": "JUCESE",
+      "validade_dias": null,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "certidao_simplificada",
+      "nome": "Certidão simplificada da Junta",
+      "categoria": "juridica",
+      "onde": "JUCESE",
+      "validade_dias": 90,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "cnd_federal",
+      "nome": "CND federal e Dívida Ativa (inclui INSS)",
+      "categoria": "fiscal",
+      "onde": "Receita/PGFN",
+      "validade_dias": 180,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "crf_fgts",
+      "nome": "CRF do FGTS",
+      "categoria": "fiscal",
+      "onde": "Caixa",
+      "validade_dias": 30,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "cndt",
+      "nome": "CNDT trabalhista",
+      "categoria": "fiscal",
+      "onde": "TST",
+      "validade_dias": 180,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "cnd_estadual",
+      "nome": "Certidão negativa estadual",
+      "categoria": "fiscal",
+      "onde": "SEFAZ-SE",
+      "validade_dias": null,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "cnd_municipal",
+      "nome": "Certidão negativa municipal",
+      "categoria": "fiscal",
+      "onde": "Prefeitura de Aracaju (SEMFAZ)",
+      "validade_dias": null,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "falencia",
+      "nome": "Certidão de falência e recuperação judicial",
+      "categoria": "economica",
+      "onde": "TJSE",
+      "validade_dias": 90,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "balanco_2025",
+      "nome": "Balanço patrimonial e DRE 2025",
+      "categoria": "economica",
+      "onde": "Contador",
+      "validade_dias": null,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "balanco_2024",
+      "nome": "Balanço patrimonial e DRE 2024",
+      "categoria": "economica",
+      "onde": "Contador",
+      "validade_dias": null,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "cenp",
+      "nome": "Certificado de qualificação técnica do CENP",
+      "categoria": "tecnica",
+      "onde": "CENP",
+      "validade_dias": null,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "atestados",
+      "nome": "Atestados de capacidade técnica",
+      "categoria": "tecnica",
+      "onde": "Clientes",
+      "validade_dias": null,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "sicaf",
+      "nome": "Cadastro SICAF atualizado",
+      "categoria": "cadastro",
+      "onde": "Compras.gov.br",
+      "validade_dias": null,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    },
+    {
+      "id": "ecnpj",
+      "nome": "Certificado digital e-CNPJ",
+      "categoria": "cadastro",
+      "onde": "Autoridade certificadora",
+      "validade_dias": null,
+      "emitido_em": null,
+      "vence_em": null,
+      "arquivo": null
+    }
+  ]
+}

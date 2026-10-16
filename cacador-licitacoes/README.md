@@ -24,6 +24,9 @@ No GitHub, o workflow **Caçador de licitações** roda em dias úteis às 07h (
 | `empresa.json` | Dados da empresa, UFs, modalidades, palavras-chave e exclusões |
 | `cacador.py` | Busca no PNCP e gera os relatórios |
 | `CHECKLIST-HABILITACAO.md` | Documentos, certidões e atestados, com onde emitir e validade |
+| `compliance.py` | Confere a validade das certidões cadastradas e avisa o que vence |
+| `compliance/documentos.json` | Cadastro dos documentos: preencha a data de emissão ou validade |
+| `compliance/PROGRAMA-INTEGRIDADE.md` | Rascunho do programa de integridade da empresa |
 | `tests/` | Testes offline (`python3 -m unittest discover -s cacador-licitacoes/tests`) |
 
-As skills do Claude ficam em `.claude/skills/`: `cacador-licitacoes`, `habilitacao-licitacoes` e `analise-edital`.
+As skills do Claude ficam em `.claude/skills/`: `cacador-licitacoes`, `habilitacao-licitacoes`, `analise-edital` e `compliance-licitacoes`.
